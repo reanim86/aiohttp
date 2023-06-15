@@ -1,0 +1,15 @@
+version: '3.9'
+
+volumes:
+  pgdata:
+
+services:
+
+  postgredb:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: "ads"
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "Tehn89tehn"
+    ports:
+      - "5431:5432"
