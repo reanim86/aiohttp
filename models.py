@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker, relationship
 
-PG_DSN = 'postgresql+asyncpg://postgres:Tehn89tehn@127.0.0.1:5432/ads'
+PG_DSN = 'postgresql+asyncpg://postgres:Tehn89tehn@postgredb:5432/ads'
 engine = create_async_engine(PG_DSN)
 Session = sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
 Base = declarative_base()
@@ -30,3 +30,4 @@ class AdsTable(Base):
     username = Column(Integer, ForeignKey('user.id'), nullable=True)
 
     user = relationship(User, backref='adstable')
+
