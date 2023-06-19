@@ -11,5 +11,13 @@ services:
       POSTGRES_DB: "ads"
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "Tehn89tehn"
-    ports:
-      - "5431:5432"
+
+  python_service:
+    build: .
+    command: bash -c "python3 models.py && python3 server.py"
+    environment:
+      - MY_ENV=aiohttp
+    expose:
+      - 8080
+    depends_on:
+      - postgredb

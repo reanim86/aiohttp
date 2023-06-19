@@ -1,12 +1,9 @@
 from aiohttp import web
 from models import engine, Base, User, AdsTable, Session
 import json
-from schema import CreateAds, PatchAds, CreateUser, PatchUser
-from pydantic import ValidationError
 from sqlalchemy.future import select
 from bcrypt import hashpw, gensalt, checkpw
 from sqlalchemy.exc import IntegrityError
-from typing import Type
 
 
 app = web.Application()
@@ -106,16 +103,15 @@ class AdsView(web.View):
     async def post(self):
         json_data = await self.request.json()
         json_data = await get_permission(json_data)
-        async with Session() as session:
-            new_ads = AdsTable(**json_data)
-            session.add(new_ads)
-            await session.commit()
-            return web.json_response({
-                'id': new_ads.id,
-                'head': new_ads.head,
-                'description': new_ads.description,
-                'user': new_ads.username
-            })
+        new_ads = AdsTable(**json_data)
+        self.request['session'].add(new_ads)
+        await self.request['session'].commit()
+        return web.json_response({
+            'id': new_ads.id,
+            'head': new_ads.head,
+            'description': new_ads.description,
+            'user': new_ads.username
+        })
 
     async def get(self):
         ads = await get_ads(int(self.request.match_info['ads_id']), self.request['session'])
@@ -128,28 +124,42 @@ class AdsView(web.View):
     async def patch(self):
         json_data = await self.request.json()
         json_data = await get_permission(json_data)
-        async with Session() as session:
-            ads = await get_ads(int(self.request.match_info['ads_id']), session)
-            if not (json_data['username'] == ads.username):
-                raise web.HTTPUnauthorized(
-                    text=json.dumps({
-                        'status': 'error',
-                        'message': 'wrong user'
-                    }),
-                    content_type='application/json'
-                )
-            for field, value in json_data.items():
-                setattr(ads, field, value)
-            await session.commit()
-            return web.json_response({
-                'id': ads.id,
-                'head': ads.head,
-                'description': ads.description,
-                'user': ads.username
-            })
+        ads = await get_ads(int(self.request.match_info['ads_id']), self.request['session'])
+        if not (json_data['username'] == ads.username):
+            raise web.HTTPUnauthorized(
+                text=json.dumps({
+                    'status': 'error',
+                    'message': 'wrong user'
+                }),
+                content_type='application/json'
+            )
+        for field, value in json_data.items():
+            setattr(ads, field, value)
+        await self.request['session'].commit()
+        return web.json_response({
+            'id': ads.id,
+            'head': ads.head,
+            'description': ads.description,
+            'user': ads.username
+        })
 
-    def delete(self):
-
+    async def delete(self):
+        json_data = await self.request.json()
+        json_data = await get_permission(json_data)
+        ads = await get_ads(int(self.request.match_info['ads_id']), self.request['session'])
+        if not (json_data['username'] == ads.username):
+            raise web.HTTPUnauthorized(
+                text=json.dumps({
+                    'status': 'error',
+                    'message': 'wrong user'
+                }),
+                content_type='application/json'
+            )
+        await self.request['session'].delete(ads)
+        await self.request['session'].commit()
+        return web.json_response({
+            'status': 'delete ok'
+        })
 
 class UserView(web.View):
 
@@ -206,7 +216,8 @@ app.add_routes([
     web.patch('/user/{user_id:\d+}', UserView),
     web.post('/ads/', AdsView),
     web.get('/ads/{ads_id:\d+}', AdsView),
-    web.patch('/ads/{ads_id:\d+}', AdsView)
+    web.patch('/ads/{ads_id:\d+}', AdsView),
+    web.delete('/ads/{ads_id:\d+}', AdsView)
 ])
 
 if __name__ == '__main__':

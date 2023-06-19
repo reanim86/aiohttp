@@ -1,16 +1,16 @@
 # примеры API-запросов
 
-@baseUrl = http://localhost:5000
+@baseUrl = http://localhost/
 
 # создание объявления
 POST {{baseUrl}}/ads/
 Content-Type: application/json
 
 {
-  "head": "Motok",
-  "description": "Best cat",
-  "username": "sochi@ya.ru",
-  "password": "87654321"
+  "head": "Motok4",
+  "description": "111",
+  "username": "anapa2@ya.ru",
+  "password": "12345678"
 }
 
 ###
@@ -22,13 +22,13 @@ Content-Type: application/json
 ###
 
 # обновление объявления
-PATCH {{baseUrl}}/ads/3
+PATCH {{baseUrl}}/ads/2
 Content-Type: application/json
 
 {
-  "head": "4",
+  "head": "5",
   "description": "4",
-  "username": "sochi@ya.ru",
+  "username": "anapa1@ya.ru",
   "password": "87654321"
 }
 
@@ -39,8 +39,8 @@ DELETE {{baseUrl}}/ads/2
 Content-Type: application/json
 
 {
-  "username": "a4@ya.ru",
-  "password": "12345678"
+  "username": "anapa1@ya.ru",
+  "password": "87654321"
 }
 
 ###
@@ -50,21 +50,21 @@ POST {{baseUrl}}/user/
 Content-Type: application/json
 
 {
-  "email": "sochi@ya.ru",
-  "password": "87654321"
+  "email": "anapa3@ya.ru",
+  "password": "12345678"
   
 }
 
 ###
 
 # получение пользователя
-GET {{baseUrl}}/user/1/
+GET {{baseUrl}}/user/1
 Content-Type: application/json
 
 ###
 
 # изменение пользователя
-PATCH {{baseUrl}}/user/1/
+PATCH {{baseUrl}}/user/3
 Content-Type: application/json
 
 {
